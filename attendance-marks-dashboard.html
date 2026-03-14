@@ -3,28 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance and Marks Dashboard</title>
-    <script>
-        function refreshData() {
-            // Logic to fetch data from the Google Sheet CSV
-            fetchDataFromCSV(); // Placeholder for actual fetch logic
-            updateLastUpdated();
-        }
-
-        function updateLastUpdated() {
-            const now = new Date().toUTCString();
-            document.getElementById('lastUpdated').innerText = 'Last Updated: ' + now;
-        }
-
-        setInterval(refreshData, 30000); // Refresh data every 30 seconds
-    </script>
+    <title>Attendance Marks Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .tab { display: none; }
+        .tab button { background-color: #f1f1f1; border: none; cursor: pointer; padding: 10px; margin: 0; }
+        .tab button:hover { background-color: #ddd; }
+        #pass { color: green; }
+        #fail { color: red; }
+    </style>
 </head>
-<body onload="refreshData()">
-    <h1>Attendance and Marks Dashboard</h1>
-    <div id="dataDisplay">
-        <!-- Data from Google Sheet CSV will be displayed here -->
+<body>
+    <h1>Attendance Marks Dashboard</h1>
+    <p>Last updated: <span id="last-updated">2026-03-14 16:09:11</span></p>
+    <button onclick="location.reload();">Manual Refresh</button>
+
+    <div>
+        <button onclick="openTab('attendance')">Attendance</button>
+        <button onclick="openTab('experiments')">Experiments</button>
+        <button onclick="openTab('average')">Average</button>
     </div>
-    <button onclick="refreshData()">Refresh</button>
-    <div id="lastUpdated">Last Updated: 2026-03-14 16:07:58</div>
+
+    <div id="attendance" class="tab">
+        <h2>Attendance</h2>
+        <!-- Add attendance data here -->
+    </div>
+    <div id="experiments" class="tab">
+        <h2>Experiments</h2>
+        <!-- Add experiments data here -->
+    </div>
+    <div id="average" class="tab">
+        <h2>Average</h2>
+        <!-- Add average calculations here -->
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            var i, tabcontent;
+            tabcontent = document.getElementsByClassName('tab');
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = 'none';
+            }
+            document.getElementById(tabName).style.display = 'block';
+        }
+
+        // Set the default tab to be open
+        openTab('attendance');
+
+        // Auto-refresh every 30 seconds
+        setInterval(function() {
+            location.reload();
+        }, 30000);
+    </script>
 </body>
 </html>
