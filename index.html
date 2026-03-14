@@ -3,113 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Performance Dashboard</title>
+    <title>Modelling Lab Attendance & Marks (S4C2 B)</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --danger: #ef4444;
-            --success: #22c55e;
-            --bg: #f8fafc;
+        :root { --primary: #2563eb; --danger: #ef4444; --success: #16a34a; --bg: #f8fafc; }
+        body { font-family: sans-serif; background: var(--bg); padding: 20px; color: #1e293b; }
+        .controls { 
+            display: flex; flex-wrap: wrap; gap: 10px; background: white; 
+            padding: 15px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px; max-width: 1000px; margin: 0 auto 20px auto; align-items: center;
         }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
-        .header { max-width: 1000px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .card { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); overflow: hidden; }
-        
-        select { padding: 10px 15px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; cursor: pointer; background: white; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-        th { background: #f1f5f9; padding: 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
-        
-        tr:hover { background-color: #f8fafc; }
-        
-        /* Conditional Formatting */
-        .status-low { background-color: #fee2e2; color: var(--danger); font-weight: 600; border-radius: 4px; padding: 2px 8px; display: inline-block; }
-        .status-ok { color: var(--success); font-weight: 600; }
-        
-        .loader { padding: 40px; text-align: center; color: #64748b; font-style: italic; }
+        select, button { padding: 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; }
+        button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; min-width: 120px; }
+        button:hover { background: #1d4ed8; }
+        .card { max-width: 1000px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .status-low { color: var(--danger); font-weight: bold; background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
+        .status-ok { color: var(--success); font-weight: bold; }
+        .loading { padding: 40px; text-align: center; color: #64748b; font-style: italic; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Class Records</h1>
-    <select id="sheetSelector" onchange="loadData()">
-        <option value="0">📅 Attendance</option>
-        <option value="538873744">🧪 EXP 1</option>
-        <option value="1743911233">🧪 EXP 2</option>
-        <option value="735020452">🧪 EXP 3</option>
-        <option value="132790111">🧪 EXP 4</option>
-        <option value="1403681896">🧪 EXP 5</option>
-        <option value="960396706">🧪 EXP 6</option>
-        <option value="657786847">🧪 EXP 7</option>
-        <option value="912535418">🧪 EXP 8</option>
-        <option value="821022304">🧪 EXP 9</option>
-        <option value="972789350">🧪 EXP 10</option>
-        <option value="1609104477">📊 Average Marks</option>
+<div class="controls">
+    <select id="sheetSelector" onchange="fetchData()">
+        <option value="0">Attendance</option>
+        <option value="538873744">EXP 1</option>
+        <option value="1743911233">EXP 2</option>
+        <option value="735020452">EXP 3</option>
+        <option value="132790111">EXP 4</option>
+        <option value="1403681896">EXP 5</option>
+        <option value="960396706">EXP 6</option>
+        <option value="657786847">EXP 7</option>
+        <option value="912535418">EXP 8</option>
+        <option value="821022304">EXP 9</option>
+        <option value="972789350">EXP 10</option>
+        <option value="1609104477">Average Marks</option>
     </select>
+
+    <select id="sortSelector">
+        <option value="none">Original Order</option>
+        <option value="high">Highest (Col C)</option>
+        <option value="low">Lowest (Col C)</option>
+    </select>
+
+    <button onclick="processAndRender()">Apply Sort</button>
 </div>
 
-<div class="card" id="mainCard">
-    <div id="tableContainer" class="loader">Select a sheet to begin...</div>
+<div class="card">
+    <div id="tableContainer"></div>
 </div>
 
 <script>
-    const base = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEvjAT5yBEs8T6di8jzkoQiPQdLUHieuruRzluxmq5Vy9N-u5EesxB9UQgWdGrTDmsZB8r6xBxlNAA/pub?output=csv";
+    const csvBase = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEvjAT5yBEs8T6di8jzkoQiPQdLUHieuruRzluxmq5Vy9N-u5EesxB9UQgWdGrTDmsZB8r6xBxlNAA/pub?output=csv";
+    let globalHeaders = [];
+    let globalRows = [];
 
-    async function loadData() {
+    async function fetchData() {
         const gid = document.getElementById('sheetSelector').value;
         const container = document.getElementById('tableContainer');
-        container.innerHTML = "Fetching latest data from Google Sheets...";
+        container.innerHTML = '<div class="loading">Fetching data...</div>';
 
         try {
-            const response = await fetch(`${base}&gid=${gid}`);
-            const data = await response.text();
-            renderCSV(data, gid);
-        } catch (err) {
-            container.innerHTML = "Error loading data. Make sure the sheet is published to web.";
+            const res = await fetch(`${csvBase}&gid=${gid}`);
+            const text = await res.text();
+            // Split into rows and remove empty ones
+            const allRows = text.split('\n').filter(r => r.trim() !== '').map(r => r.split(','));
+            
+            // HEADERS: Taking Row 2 (index 1) as the table headers
+            globalHeaders = allRows[1] || allRows[0];
+            
+            // DATA: Student data starts on Row 3 (index 2)
+            globalRows = allRows.slice(2);
+            
+            processAndRender();
+        } catch (e) {
+            container.innerHTML = '<div class="loading">Connection Error. Is the sheet published?</div>';
         }
     }
 
-    function renderCSV(csv, gid) {
-        const rows = csv.split('\n').filter(row => row.trim() !== '').map(row => row.split(','));
-        if (rows.length === 0) return;
+    function cleanNum(val) {
+        if (!val) return -1;
+        let cleaned = val.toString().replace(/[^\d.-]/g, '');
+        return cleaned === '' ? -1 : parseFloat(cleaned);
+    }
 
-        // Threshold logic: Attendance (GID 0) is 75, others are 10
-        const isAttendance = (gid === "0");
-        const threshold = isAttendance ? 75 : 10;
+    function processAndRender() {
+        const sortType = document.getElementById('sortSelector').value;
+        const gid = document.getElementById('sheetSelector').value;
+        const threshold = (gid === "0") ? 75 : 10;
+        const targetCol = 2; // Column C
 
-        let tableHtml = '<table><thead><tr>';
-        rows[0].forEach(header => tableHtml += `<th>${header}</th>`);
-        tableHtml += '</tr></thead><tbody>';
+        let dataToDisplay = [...globalRows];
 
-        for (let i = 1; i < rows.length; i++) {
-            tableHtml += '<tr>';
-            rows[i].forEach((cell, index) => {
-                let content = cell.trim();
-                let numeric = parseFloat(content.replace('%', ''));
+        if (sortType === 'high') {
+            dataToDisplay.sort((a, b) => cleanNum(b[targetCol]) - cleanNum(a[targetCol]));
+        } else if (sortType === 'low') {
+            dataToDisplay.sort((a, b) => cleanNum(a[targetCol]) - cleanNum(b[targetCol]));
+        }
+
+        let html = '<table><thead><tr>';
+        globalHeaders.forEach(h => html += `<th>${h}</th>`);
+        html += '</tr></thead><tbody>';
+
+        dataToDisplay.forEach(row => {
+            html += '<tr>';
+            row.forEach((cell, i) => {
+                let val = cell ? cell.trim() : "";
+                let num = cleanNum(val);
                 let style = "";
-
-                // Apply colors only to numeric data columns (assuming index 0 is Name/ID)
-                if (index > 0 && !isNaN(numeric)) {
-                    if (numeric < threshold) {
-                        style = 'class="status-low"';
-                    } else {
-                        style = 'class="status-ok"';
-                    }
+                
+                // Color formatting logic for Column C
+                if (i === targetCol && num !== -1) {
+                    style = (num < threshold) ? 'status-low' : 'status-ok';
                 }
-                tableHtml += `<td><span ${style}>${content}</span></td>`;
+                
+                html += `<td><span class="${style}">${val}</span></td>`;
             });
-            tableHtml += '</tr>';
-        }
+            html += '</tr>';
+        });
 
-        tableHtml += '</tbody></table>';
-        document.getElementById('tableContainer').innerHTML = tableHtml;
+        html += '</tbody></table>';
+        document.getElementById('tableContainer').innerHTML = html;
     }
 
-    // Auto-load attendance on start
-    window.onload = loadData;
+    window.onload = fetchData;
 </script>
-
 </body>
 </html>
