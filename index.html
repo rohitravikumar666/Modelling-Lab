@@ -3,43 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Records Dashboard</title>
+    <title>Civil Engineering Modelling Lab (S4C2 B)</title>
     <style>
-        :root { --primary: #2563eb; --danger: #ef4444; --success: #16a34a; --bg: #f8fafc; }
-        body { font-family: sans-serif; background: var(--bg); padding: 20px; color: #1e293b; }
-        .controls { 
-            display: flex; flex-wrap: wrap; gap: 10px; background: white; 
-            padding: 15px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px; max-width: 1000px; margin: 0 auto 20px auto; align-items: center;
+        :root { --primary: #1e293b; --accent: #2563eb; --danger: #ef4444; --success: #16a34a; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: #334155; margin: 0; }
+        
+        /* Fixed Header for Title */
+        .main-header { 
+            max-width: 1000px; 
+            margin: 0 auto 30px auto; 
+            text-align: center; 
+            background: #ffffff; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        select, button { padding: 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; }
-        button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; min-width: 120px; }
+        .main-header h1 { margin: 0; color: var(--primary); font-size: 2rem; }
+        .main-header p { margin: 10px 0 0 0; color: var(--accent); font-weight: bold; font-size: 1.2rem; }
+
+        .controls { 
+            display: flex; flex-wrap: wrap; gap: 12px; background: white; 
+            padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; align-items: center;
+        }
+        
+        select, button { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; }
+        select { flex: 2; min-width: 200px; }
+        button { background: var(--accent); color: white; border: none; cursor: pointer; font-weight: bold; flex: 1; transition: 0.3s; }
         button:hover { background: #1d4ed8; }
-        .card { max-width: 1000px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { background: #f1f5f9; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 13px; }
+
+        .card { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #f8fafc; padding: 15px 12px; text-align: left; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 13px; text-transform: uppercase; }
         td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-        .status-low { color: var(--danger); font-weight: bold; background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
+        
+        .status-low { color: var(--danger); font-weight: bold; background: #fee2e2; padding: 3px 8px; border-radius: 4px; }
         .status-ok { color: var(--success); font-weight: bold; }
-        .loading { padding: 40px; text-align: center; color: #64748b; font-style: italic; }
+        .loading { padding: 50px; text-align: center; color: #64748b; font-style: italic; }
     </style>
 </head>
 <body>
 
+<div class="main-header">
+    <h1>Civil Engineering Modelling Lab</h1>
+    <p>S4C2 B</p>
+</div>
+
 <div class="controls">
     <select id="sheetSelector" onchange="fetchData()">
-        <option value="0">Attendance</option>
-        <option value="538873744">EXP 1</option>
-        <option value="1743911233">EXP 2</option>
-        <option value="735020452">EXP 3</option>
-        <option value="132790111">EXP 4</option>
-        <option value="1403681896">EXP 5</option>
-        <option value="960396706">EXP 6</option>
-        <option value="657786847">EXP 7</option>
-        <option value="912535418">EXP 8</option>
-        <option value="821022304">EXP 9</option>
-        <option value="972789350">EXP 10</option>
-        <option value="1609104477">Average Marks</option>
+        <option value="0">📅 Attendance Records</option>
+        <option value="538873744">🧪 Experiment 1</option>
+        <option value="1743911233">🧪 Experiment 2</option>
+        <option value="735020452">🧪 Experiment 3</option>
+        <option value="132790111">🧪 Experiment 4</option>
+        <option value="1403681896">🧪 Experiment 5</option>
+        <option value="960396706">🧪 Experiment 6</option>
+        <option value="657786847">🧪 Experiment 7</option>
+        <option value="912535418">🧪 Experiment 8</option>
+        <option value="821022304">🧪 Experiment 9</option>
+        <option value="972789350">🧪 Experiment 10</option>
+        <option value="1609104477">📊 Average Marks</option>
     </select>
 
     <select id="sortSelector">
@@ -52,7 +75,9 @@
 </div>
 
 <div class="card">
-    <div id="tableContainer"></div>
+    <div id="tableContainer">
+        <div class="loading">Dashboard is preparing...</div>
+    </div>
 </div>
 
 <script>
@@ -63,23 +88,21 @@
     async function fetchData() {
         const gid = document.getElementById('sheetSelector').value;
         const container = document.getElementById('tableContainer');
-        container.innerHTML = '<div class="loading">Fetching data...</div>';
+        container.innerHTML = '<div class="loading">Loading data...</div>';
 
         try {
             const res = await fetch(`${csvBase}&gid=${gid}`);
             const text = await res.text();
-            // Split into rows and remove empty ones
             const allRows = text.split('\n').filter(r => r.trim() !== '').map(r => r.split(','));
             
-            // HEADERS: Taking Row 2 (index 1) as the table headers
-            globalHeaders = allRows[1] || allRows[0];
-            
-            // DATA: Student data starts on Row 3 (index 2)
+            // HEADERS: Row 2 (index 1)
+            globalHeaders = allRows[1] || ["Roll No", "Name", "Result"];
+            // DATA: Row 3 (index 2)
             globalRows = allRows.slice(2);
             
             processAndRender();
         } catch (e) {
-            container.innerHTML = '<div class="loading">Connection Error. Is the sheet published?</div>';
+            container.innerHTML = '<div class="loading">⚠️ Error connecting to data source.</div>';
         }
     }
 
@@ -114,7 +137,6 @@
                 let num = cleanNum(val);
                 let style = "";
                 
-                // Color formatting logic for Column C
                 if (i === targetCol && num !== -1) {
                     style = (num < threshold) ? 'status-low' : 'status-ok';
                 }
